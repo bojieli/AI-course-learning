@@ -2,7 +2,6 @@ function [ ypred, accuracy ] = lsclassifier(traindata, trainlabel, testdata, tes
     [~,     ~] = size(traindata);
     [testm, n] = size(testdata);
     left = (traindata' * traindata) + lambda * eye(n);
-    size(left)
     w = left \ (traindata' * trainlabel);
     ypred = testdata * w;
     for i = 1:testm

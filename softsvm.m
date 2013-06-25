@@ -1,9 +1,13 @@
 function [ ypred, accuracy ] = softsvm(traindata, trainlabel, testdata, testlabel, sigma, C)
     [trainm, ~] = size(traindata);
-    train_limit = 200;
+    train_limit = 100;
+    % if train dataset is too large, "quadprog" will be very slow
     if trainm > train_limit
         trainm = train_limit;
+        traindata = traindata(1:train_limit,:);
+        trainlabel = trainlabel(1:train_limit,:);
     end
+    
     [testm,  ~] = size(testdata);
 
     f = -ones(trainm, 1);
@@ -35,7 +39,7 @@ function [ ypred, accuracy ] = softsvm(traindata, trainlabel, testdata, testlabe
     for i = 1:testm
         pred = b;
         for j = 1:trainm
-            % for alpha(j)==0, w(j)=0
+            % for alpha(j)==0, w(j) is always 0
             pred = pred + w(j) * kernel_func(sigma, testdata(i,:), traindata(j,:));
         end
         preds(i) = pred;
@@ -52,6 +56,7 @@ function kernel = kernel_func(sigma, x, y)
     if sigma == 0
         kernel = x * y';
     else
-        kernel = e ^ (- sum((x - y)^2) / sigma^2);
+        e = 2.718281828;
+        kernel = e ^ (- sum((x - y).^2) / sigma^2);
     end
 end
